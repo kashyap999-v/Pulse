@@ -1,13 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { PrismaClient } from "@prisma/client";
 
+const db = new PrismaClient();
 
 export async function GET(req: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
+    const sessionToken = req.cookies.get("session_token")?.value;
+    if (!sessionToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const session = await db.session.findUnique({
+      where: { sessionToken },
+      include: { user: true },
+    });
+
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = session.user;
 
     const businessId = req.nextUrl.searchParams.get("businessId");
     if (!businessId) {
@@ -43,10 +55,21 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
+    const sessionToken = req.cookies.get("session_token")?.value;
+    if (!sessionToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const session = await db.session.findUnique({
+      where: { sessionToken },
+      include: { user: true },
+    });
+
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = session.user;
 
     const body = await req.json();
     const { businessId, name, audience, offer, message, channel } = body;
