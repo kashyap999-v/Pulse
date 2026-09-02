@@ -5,18 +5,18 @@ import { cookies } from "next/headers";
 
 async function getSessionUser(req: NextRequest) {
   const cookieStore = await cookies();
-  const token = cookieStore.get("session_token")?.value;
+  const sessionToken = cookieStore.get("session_token")?.value;
 
-  if (!token) {
+  if (!sessionToken) {
     return null;
   }
 
   const session = await db.session.findUnique({
-    where: { token },
+    where: { sessionToken },
     include: { user: true },
   });
 
-  if (!session || new Date() > session.expiresAt) {
+  if (!session || new Date() > session.expires) {
     return null;
   }
 

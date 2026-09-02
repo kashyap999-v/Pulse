@@ -3,27 +3,27 @@ import { db } from "@/lib/db";
 import { createCustomerSchema } from "@/lib/validators";
 import { cookies } from "next/headers";
 
-async function getSessionUser(_req: NextRequest) {
+async function getSessionUser(req: NextRequest) {
   const cookieStore = await cookies();
-  const token = cookieStore.get("session_token")?.value;
+  const sessionToken = cookieStore.get("session_token")?.value;
 
-  if (!token) {
+  if (!sessionToken) {
     return null;
   }
 
   const session = await db.session.findUnique({
-    where: { token },
+    where: { sessionToken },
     include: { user: true },
   });
 
-  if (!session || new Date() > session.expiresAt) {
+  if (!session || new Date() > session.expires) {
     return null;
   }
 
   return session.user;
 }
 
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     const user = await getSessionUser(req);
     if (!user) {
@@ -85,7 +85,7 @@ export async function GET(_req: NextRequest) {
   }
 }
 
-export async function POST(_req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     const user = await getSessionUser(req);
     if (!user) {
