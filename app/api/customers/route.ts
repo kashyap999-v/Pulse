@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { createCustomerSchema } from "@/lib/validators";
 import { cookies } from "next/headers";
 
-async function getSessionUser(req: NextRequest) {
+async function getSessionUser(_req: NextRequest) {
   const cookieStore = await cookies();
   const token = cookieStore.get("session_token")?.value;
 
@@ -23,7 +23,7 @@ async function getSessionUser(req: NextRequest) {
   return session.user;
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const user = await getSessionUser(req);
     if (!user) {
@@ -85,7 +85,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   try {
     const user = await getSessionUser(req);
     if (!user) {
@@ -139,3 +139,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

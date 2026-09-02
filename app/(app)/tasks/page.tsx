@@ -47,7 +47,7 @@ export default function TasksPage() {
     LOW: "bg-success/10 text-success",
   };
 
-  const statusColors: Record<string, string> = {
+  const _statusColors: Record<string, string> = {
     TODO: "bg-neutral/10 text-neutral",
     IN_PROGRESS: "bg-primary/10 text-primary",
     DONE: "bg-success/10 text-success",
@@ -163,3 +163,4 @@ export default function TasksPage() {
     </div>
   );
 }
+
