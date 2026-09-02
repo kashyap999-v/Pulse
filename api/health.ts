@@ -1,8 +1,7 @@
-export const config = {
-  runtime: 'nodejs18.x',
-};
-
-// Vercel serverless function - can be empty as Next.js handles routing
-export default function handler(req, res) {
-  res.status(200).json({ message: 'PULSE is running!' });
-}
+﻿export const config = { 
+    runtime: 'nodejs18.x',
+  }; 
+     
+  export default function handler(_req: any, res: any) {
+    res.status(200).json({ message: 'PULSE is running!' });
+  }
