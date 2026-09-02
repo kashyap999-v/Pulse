@@ -1,0 +1,521 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// Authentication & User Management
+// ============================================================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  image         String?
+  emailVerified Boolean   @default(false)
+  password      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  businesses    BusinessUser[]
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  sessionToken String @unique
+  userId    String
+  expires   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// ============================================================================
+// Business & Multi-Tenant Structure
+// ============================================================================
+
+model Business {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  description   String?
+  logo          String?
+  website       String?
+  industry      String?
+  taxId         String?
+  email         String?
+  phone         String?
+  address       String?
+  city          String?
+  state         String?
+  zipCode       String?
+  country       String?
+  timezone      String   @default("UTC")
+  currency      String   @default("USD")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  users         BusinessUser[]
+  customers     Customer[]
+  products      Product[]
+  inventory     Inventory[]
+  orders        Order[]
+  expenses      Expense[]
+  invoices      Invoice[]
+  tasks         Task[]
+  campaigns     Campaign[]
+  notifications Notification[]
+  insights      AIInsight[]
+  metrics       BusinessMetric[]
+
+  @@index([slug])
+  @@map("businesses")
+}
+
+model BusinessUser {
+  id        String   @id @default(cuid())
+  businessId String
+  userId    String
+  role      UserRole @default(MEMBER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, userId])
+  @@index([businessId])
+  @@index([userId])
+  @@map("business_users")
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  MANAGER
+  MEMBER
+  VIEWER
+}
+
+// ============================================================================
+// Customer Management
+// ============================================================================
+
+model Customer {
+  id          String   @id @default(cuid())
+  businessId  String
+  firstName   String
+  lastName    String
+  email       String
+  phone       String?
+  company     String?
+  address     String?
+  city        String?
+  state       String?
+  zipCode     String?
+  country     String?
+  notes       String?
+  customerType CustomerType @default(INDIVIDUAL)
+  taxId       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  orders   Order[]
+  invoices Invoice[]
+
+  @@unique([businessId, email])
+  @@index([businessId])
+  @@index([email])
+  @@map("customers")
+}
+
+enum CustomerType {
+  INDIVIDUAL
+  BUSINESS
+  ENTERPRISE
+}
+
+// ============================================================================
+// Product & Inventory Management
+// ============================================================================
+
+model Product {
+  id          String   @id @default(cuid())
+  businessId  String
+  name        String
+  description String?
+  sku         String
+  price       Float    @default(0)
+  cost        Float    @default(0)
+  category    String?
+  status      ProductStatus @default(ACTIVE)
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  inventory    Inventory?
+  orderItems   OrderItem[]
+
+  @@unique([businessId, sku])
+  @@index([businessId])
+  @@index([status])
+  @@map("products")
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+model Inventory {
+  id             String   @id @default(cuid())
+  businessId     String
+  productId      String   @unique
+  quantity       Int      @default(0)
+  reorderLevel   Int      @default(10)
+  reorderQuantity Int    @default(50)
+  lastRestocked  DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([productId])
+  @@map("inventories")
+}
+
+// ============================================================================
+// Order Management
+// ============================================================================
+
+model Order {
+  id          String   @id @default(cuid())
+  businessId  String
+  customerId  String
+  orderNumber String
+  status      OrderStatus @default(PENDING)
+  subtotal    Float    @default(0)
+  tax         Float    @default(0)
+  shipping    Float    @default(0)
+  total       Float    @default(0)
+  notes       String?
+  dueDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business    Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  customer    Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items       OrderItem[]
+
+  @@unique([businessId, orderNumber])
+  @@index([businessId])
+  @@index([customerId])
+  @@index([status])
+  @@map("orders")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+  total     Float
+  createdAt DateTime @default(now())
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+// ============================================================================
+// Financial Management
+// ============================================================================
+
+model Expense {
+  id          String   @id @default(cuid())
+  businessId  String
+  category    String
+  description String
+  amount      Float
+  status      ExpenseStatus @default(PENDING)
+  date        DateTime
+  receipt     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([status])
+  @@index([date])
+  @@map("expenses")
+}
+
+enum ExpenseStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
+}
+
+model Invoice {
+  id            String   @id @default(cuid())
+  businessId    String
+  customerId    String
+  invoiceNumber String
+  status        InvoiceStatus @default(DRAFT)
+  subtotal      Float    @default(0)
+  tax           Float    @default(0)
+  total         Float    @default(0)
+  notes         String?
+  issueDate     DateTime @default(now())
+  dueDate       DateTime
+  paidDate      DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, invoiceNumber])
+  @@index([businessId])
+  @@index([customerId])
+  @@index([status])
+  @@map("invoices")
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  VIEWED
+  PARTIAL
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+// ============================================================================
+// Task & Project Management
+// ============================================================================
+
+model Task {
+  id          String   @id @default(cuid())
+  businessId  String
+  title       String
+  description String?
+  status      TaskStatus @default(TODO)
+  priority    Priority   @default(MEDIUM)
+  dueDate     DateTime?
+  assignee    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([status])
+  @@index([priority])
+  @@map("tasks")
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  COMPLETED
+  CANCELLED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// ============================================================================
+// Marketing & Campaigns
+// ============================================================================
+
+model Campaign {
+  id          String   @id @default(cuid())
+  businessId  String
+  name        String
+  description String?
+  type        CampaignType
+  status      CampaignStatus @default(DRAFT)
+  startDate   DateTime?
+  endDate     DateTime?
+  budget      Float    @default(0)
+  spent       Float    @default(0)
+  reach       Int      @default(0)
+  conversions Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([status])
+  @@map("campaigns")
+}
+
+enum CampaignType {
+  EMAIL
+  SOCIAL_MEDIA
+  PAID_ADS
+  CONTENT
+  REFERRAL
+  OTHER
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+// ============================================================================
+// Notifications
+// ============================================================================
+
+model Notification {
+  id        String   @id @default(cuid())
+  businessId String
+  title     String
+  message   String
+  type      NotificationType
+  read      Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([read])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  ORDER
+  INVOICE
+  INVENTORY
+  TASK
+  EXPENSE
+  SYSTEM
+}
+
+// ============================================================================
+// AI & Analytics
+// ============================================================================
+
+model AIInsight {
+  id          String   @id @default(cuid())
+  businessId  String
+  title       String
+  description String
+  category    InsightCategory
+  confidence  Float    @default(0)
+  actionable  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([category])
+  @@map("ai_insights")
+}
+
+enum InsightCategory {
+  SALES_TREND
+  INVENTORY_WARNING
+  CASH_FLOW
+  CUSTOMER_CHURN
+  GROWTH_OPPORTUNITY
+  COST_REDUCTION
+}
+
+model BusinessMetric {
+  id             String   @id @default(cuid())
+  businessId     String
+  metricType     MetricType
+  value          Float
+  period         String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, metricType, period])
+  @@index([businessId])
+  @@index([metricType])
+  @@index([period])
+  @@map("business_metrics")
+}
+
+enum MetricType {
+  TOTAL_REVENUE
+  TOTAL_EXPENSES
+  NET_PROFIT
+  GROSS_MARGIN
+  CUSTOMER_COUNT
+  AVERAGE_ORDER_VALUE
+  INVENTORY_TURNOVER
+  CASH_ON_HAND
+}
