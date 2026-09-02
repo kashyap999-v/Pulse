@@ -55,7 +55,7 @@ export default function NewCustomerPage() {
       }
 
       router.push("/customers");
-    } catch (err) {
+    } catch (_err) {
       setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);

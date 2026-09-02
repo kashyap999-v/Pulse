@@ -60,7 +60,7 @@ export default function OnboardingPage() {
 
         // Redirect to dashboard
         router.push("/dashboard");
-      } catch (err) {
+      } catch (_err) {
         setError("An error occurred. Please try again.");
       } finally {
         setLoading(false);
