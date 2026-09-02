@@ -72,9 +72,9 @@ export async function POST(req: NextRequest) {
     const user = session.user;
 
     const body = await req.json();
-    const { businessId, name, audience, offer, message, channel } = body;
+    const { businessId, name, description, type, budget, startDate, endDate } = body;
 
-    if (!businessId || !name) {
+    if (!businessId || !name || !type) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -93,10 +93,11 @@ export async function POST(req: NextRequest) {
       data: {
         businessId,
         name,
-        audience,
-        offer,
-        message,
-        channel,
+        description,
+        type,
+        budget: budget ? parseFloat(budget) : 0,
+        startDate: startDate ? new Date(startDate) : null,
+        endDate: endDate ? new Date(endDate) : null,
         status: "DRAFT",
       },
     });
