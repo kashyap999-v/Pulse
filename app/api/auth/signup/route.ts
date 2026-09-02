@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
       data: {
         userId: user.id,
         sessionToken: token,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       },
     });
 
