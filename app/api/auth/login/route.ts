@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+
+const db = new PrismaClient();
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,18 +32,18 @@ export async function POST(req: NextRequest) {
     const session = await db.session.create({
       data: {
         userId: user.id,
-        token,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+        sessionToken: token,
+        expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
       },
     });
 
     const response = NextResponse.json({
       success: true,
       user: { id: user.id, email: user.email, name: user.name },
-      token: session.token,
+      token: session.sessionToken,
     });
 
-    response.cookies.set("session_token", token, {
+    response.cookies.set("session_token", session.sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

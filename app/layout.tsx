@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import React from 'react';
 import '../styles/globals.css';
+import { SessionProvider } from '@/components/session-provider';
 
 export const metadata: Metadata = {
   title: 'PULSE - Business Management Platform',
@@ -28,8 +29,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#2563eb" />
       </head>
       <body>
-        {/* Global Providers will be added here */}
-        {children}
+        <SessionProvider>
+          {children}
+        </SessionProvider>
       </body>
     </html>
   );

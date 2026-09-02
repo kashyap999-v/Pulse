@@ -4,7 +4,7 @@ import { useSession } from "@/components/session-provider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-export default function AppDashboard() {
+export default function ProductsPage() {
   const { session, loading } = useSession();
   const router = useRouter();
 
@@ -25,20 +25,11 @@ export default function AppDashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-2">
-          Welcome to PULSE. Your business at a glance.
-        </p>
+        <h1 className="text-3xl font-bold text-gray-900">Products</h1>
+        <p className="text-gray-600 mt-2">Manage your business products</p>
       </div>
-      <div className="grid grid-cols-4 gap-6">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="card">
-            <p className="text-sm text-gray-600">Metric {i}</p>
-            <p className="text-2xl font-bold text-gray-900 mt-2">
-              --
-            </p>
-          </div>
-        ))}
+      <div className="card">
+        <p className="text-gray-600">Products module coming soon...</p>
       </div>
     </div>
   );

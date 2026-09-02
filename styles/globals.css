@@ -13,11 +13,11 @@
 
 @layer base {
   * {
-    @apply border-pulse-neutral/20;
+    border-color: rgb(var(--pulse-neutral) / 0.2);
   }
 
   body {
-    @apply bg-white text-pulse-neutral/900 antialiased;
+    @apply bg-white text-gray-700 antialiased;
   }
 
   h1 {
@@ -47,31 +47,65 @@
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white bg-pulse-primary/500 hover:bg-pulse-primary/600 active:bg-pulse-primary/700 transition-colors;
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white transition-colors;
+    background-color: rgb(var(--pulse-primary));
+  }
+
+  .btn-primary:hover {
+    background-color: rgb(var(--pulse-primary) / 0.8);
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-pulse-neutral/700 bg-pulse-neutral/100 hover:bg-pulse-neutral/200 active:bg-pulse-neutral/300 transition-colors;
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors;
+    color: rgb(var(--pulse-neutral));
+    background-color: rgb(var(--pulse-neutral) / 0.1);
+  }
+
+  .btn-secondary:hover {
+    background-color: rgb(var(--pulse-neutral) / 0.2);
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white bg-pulse-danger/500 hover:bg-pulse-danger/600 active:bg-pulse-danger/700 transition-colors;
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white transition-colors;
+    background-color: rgb(var(--pulse-danger));
+  }
+
+  .btn-danger:hover {
+    background-color: rgb(var(--pulse-danger) / 0.8);
   }
 
   .btn-success {
-    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white bg-pulse-success/500 hover:bg-pulse-success/600 active:bg-pulse-success/700 transition-colors;
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-white transition-colors;
+    background-color: rgb(var(--pulse-success));
+  }
+
+  .btn-success:hover {
+    background-color: rgb(var(--pulse-success) / 0.8);
   }
 
   .card {
-    @apply rounded-lg border border-pulse-neutral/10 bg-white p-6 shadow-sm;
+    @apply rounded-lg bg-white p-6 shadow-sm;
+    border: 1px solid rgb(var(--pulse-neutral) / 0.1);
   }
 
   .input-base {
-    @apply w-full rounded-lg border border-pulse-neutral/20 bg-white px-4 py-2 text-pulse-neutral/900 placeholder-pulse-neutral/40 transition-colors focus:border-pulse-primary/500 focus:outline-none focus:ring-2 focus:ring-pulse-primary/500 focus:ring-opacity-5;
+    @apply w-full rounded-lg bg-white px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-opacity-5;
+    border: 1px solid rgb(var(--pulse-neutral) / 0.2);
+    color: rgb(var(--pulse-neutral) / 0.9);
+  }
+
+  .input-base::placeholder {
+    color: rgb(var(--pulse-neutral) / 0.4);
+  }
+
+  .input-base:focus {
+    border-color: rgb(var(--pulse-primary));
+    background-color: rgb(var(--pulse-primary) / 0.02);
   }
 
   .label-base {
-    @apply block text-sm font-medium text-pulse-neutral/700;
+    @apply block text-sm font-medium;
+    color: rgb(var(--pulse-neutral) / 0.7);
   }
 
   .badge {
@@ -79,19 +113,27 @@
   }
 
   .badge-primary {
-    @apply badge bg-pulse-primary/100 text-pulse-primary/700;
+    @apply badge;
+    background-color: rgb(var(--pulse-primary) / 0.1);
+    color: rgb(var(--pulse-primary));
   }
 
   .badge-success {
-    @apply badge bg-pulse-success/100 text-pulse-success/700;
+    @apply badge;
+    background-color: rgb(var(--pulse-success) / 0.1);
+    color: rgb(var(--pulse-success));
   }
 
   .badge-warning {
-    @apply badge bg-pulse-warning/100 text-pulse-warning/700;
+    @apply badge;
+    background-color: rgb(var(--pulse-warning) / 0.1);
+    color: rgb(var(--pulse-warning));
   }
 
   .badge-danger {
-    @apply badge bg-pulse-danger/100 text-pulse-danger/700;
+    @apply badge;
+    background-color: rgb(var(--pulse-danger) / 0.1);
+    color: rgb(var(--pulse-danger));
   }
 }
 
@@ -106,10 +148,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(from rgb(115, 115, 115) r g b / 0.2);
+  background: rgb(var(--pulse-neutral) / 0.2);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgb(from rgb(115, 115, 115) r g b / 0.3);
+  background: rgb(var(--pulse-neutral) / 0.3);
 }

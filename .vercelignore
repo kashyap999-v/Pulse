@@ -1,0 +1,26 @@
+# .vercelignore
+# Files to exclude from Vercel deployment
+
+node_modules
+.git
+.gitignore
+README.md
+QUICKSTART.md
+DEPLOYMENT.md
+DEPLOY_VERCEL.md
+BUILD_SUMMARY.md
+PROJECT_COMPLETION_REPORT.md
+IMPLEMENTATION_STATUS.md
+FINAL_BUILD_REPORT.md
+*.local
+.env.local
+.env.*.local
+prisma/seed.ts
+setup.sh
+deploy.sh
+.github
+.vscode
+.idea
+*.log
+npm-debug.log*
+.DS_Store
