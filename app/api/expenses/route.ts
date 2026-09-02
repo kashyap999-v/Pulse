@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { businessId, category, description, amount, date, isRecurring, frequency, notes } = body;
+    const { businessId, category, description, amount, date, receipt, status } = body;
 
     if (!businessId || !category || !description || !amount || !date) {
       return NextResponse.json(
@@ -73,13 +73,12 @@ export async function POST(req: NextRequest) {
     const expense = await db.expense.create({
       data: {
         businessId,
-        category: category as any,
+        category,
         description,
         amount: parseFloat(amount),
         date: new Date(date),
-        isRecurring: isRecurring || false,
-        frequency: frequency || null,
-        notes,
+        receipt: receipt || null,
+        status: status || "PENDING",
       },
     });
 
