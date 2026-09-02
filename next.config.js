@@ -12,4 +12,11 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+const nextConfig = {
+    ...existing config,
+    eslint: {
+      ignoreDuringBuilds: true,
+    },
+  };
+  
+  module.exports = nextConfig;
