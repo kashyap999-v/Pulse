@@ -70,7 +70,7 @@ export default function NewExpensePage() {
       }
 
       router.push("/expenses");
-    } catch (_err) {
+    } catch (error) {
       setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);
