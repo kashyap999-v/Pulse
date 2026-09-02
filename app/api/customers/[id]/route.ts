@@ -45,12 +45,12 @@ export async function GET(
       );
     }
 
-    // Verify user owns this business
-    const business = await db.business.findUnique({
-      where: { id: customer.businessId },
+    // Verify user has access to this business
+    const businessUser = await db.businessUser.findFirst({
+      where: { businessId: customer.businessId, userId: user.id },
     });
 
-    if (!business || business.ownerId !== user.id) {
+    if (!businessUser) {
       return NextResponse.json(
         { error: "Access denied" },
         { status: 403 }
@@ -91,12 +91,12 @@ export async function PUT(
       );
     }
 
-    // Verify user owns this business
-    const business = await db.business.findUnique({
-      where: { id: customer.businessId },
+    // Verify user has access to this business
+    const businessUser = await db.businessUser.findFirst({
+      where: { businessId: customer.businessId, userId: user.id },
     });
 
-    if (!business || business.ownerId !== user.id) {
+    if (!businessUser) {
       return NextResponse.json(
         { error: "Access denied" },
         { status: 403 }
@@ -145,12 +145,12 @@ export async function DELETE(
       );
     }
 
-    // Verify user owns this business
-    const business = await db.business.findUnique({
-      where: { id: customer.businessId },
+    // Verify user has access to this business
+    const businessUser = await db.businessUser.findFirst({
+      where: { businessId: customer.businessId, userId: user.id },
     });
 
-    if (!business || business.ownerId !== user.id) {
+    if (!businessUser) {
       return NextResponse.json(
         { error: "Access denied" },
         { status: 403 }

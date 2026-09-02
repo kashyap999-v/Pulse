@@ -43,12 +43,12 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Verify user owns this business
-    const business = await db.business.findUnique({
-      where: { id: businessId },
+    // Verify user has access to this business
+    const businessUser = await db.businessUser.findFirst({
+      where: { businessId, userId: user.id },
     });
 
-    if (!business || business.ownerId !== user.id) {
+    if (!businessUser) {
       return NextResponse.json(
         { error: "Access denied" },
         { status: 403 }
@@ -102,12 +102,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verify user owns this business
-    const business = await db.business.findUnique({
-      where: { id: businessId },
+    // Verify user has access to this business
+    const businessUser = await db.businessUser.findFirst({
+      where: { businessId, userId: user.id },
     });
 
-    if (!business || business.ownerId !== user.id) {
+    if (!businessUser) {
       return NextResponse.json(
         { error: "Access denied" },
         { status: 403 }
