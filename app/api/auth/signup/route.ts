@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import bcrypt from "bcryptjs";
+import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import bcrypt from 'bcryptjs';
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 
     if (!email || !password || !name) {
       return NextResponse.json(
-        { error: "Name, email, and password are required" },
+        { error: 'Name, email, and password are required' },
         { status: 400 }
       );
     }
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const existingUser = await db.user.findUnique({ where: { email } });
     if (existingUser) {
       return NextResponse.json(
-        { error: "Email already in use" },
+        { error: 'Email already in use' },
         { status: 400 }
       );
     }
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     await db.session.create({
       data: {
         userId: user.id,
-        token,
+        sessionToken: token,
         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       },
     });
@@ -50,18 +50,18 @@ export async function POST(req: NextRequest) {
       token,
     });
 
-    response.cookies.set("session_token", token, {
+    response.cookies.set('session_token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       maxAge: 30 * 24 * 60 * 60,
     });
 
     return response;
   } catch (error) {
-    console.error("Signup error:", error);
+    console.error('Signup error:', error);
     return NextResponse.json(
-      { error: "Failed to create account" },
+      { error: 'Failed to create account' },
       { status: 500 }
     );
   }
